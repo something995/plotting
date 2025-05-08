@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Analysis</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        .analysis-container {
+            display: flex;
+            gap: 20px;
+        }
+        .controls {
+            width: 300px;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .plot-area {
+            flex-grow: 1;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        select, button {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+            box-sizing: border-box;
+            margin-bottom: 10px;
+        }
+        img {
+            max-width: 100%;
+            height: auto;
+        }
+        .error {
+            color: red;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container analysis-container">
+        <div class="controls">
+            <h2>Select Axes and Plot Type</h2>
+            <form method="POST" action="/analyze">
+                <div class="form-group">
+                    <label for="x_axis">X-Axis:</label>
+                    <select name="x_axis" id="x_axis" required>
+                        {% for col in columns %}
+                        <option value="{{ col }}">{{ col }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="y_axis">Y-Axis:</label>
+                    <select name="y_axis" id="y_axis" required>
+                        {% for col in columns %}
+                        <option value="{{ col }}">{{ col }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="z_axis">Z-Axis (for 3D plots):</label>
+                    <select name="z_axis" id="z_axis">
+                        <option value="">None</option>
+                        {% for col in columns %}
+                        <option value="{{ col }}">{{ col }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="plot_type">Plot Type:</label>
+                    <select name="plot_type" id="plot_type">
+                        <option value="scatter">Scatter</option>
+                        <option value="line">Line</option>
+                        <option value="bar">Bar (2D)</option>
+                        <option value="hist">Histogram (2D)</option>
+                        <option value="box">Box Plot (2D)</option>
+                        <option value="surface">Surface (3D)</option>
+                        <option value="bar3d">3D Bar</option>
+                        <option value="contour">Contour 3D</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn">Generate Plot</button>
+            </form>
+        </div>
+        <div class="plot-area">
+            <h2>Generated Plot</h2>
+            {% if plot_url %}
+            <img src="data:image/png;base64,{{ plot_url }}" alt="Generated Plot">
+            {% elif error %}
+            <p class="error">{{ error }}</p>
+            {% else %}
+            <p>No plot generated yet. Please select axes and plot type.</p>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>
